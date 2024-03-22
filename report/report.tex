@@ -20,6 +20,7 @@
 %----------------------------------------------------------------------------------------
 \documentclass[fleqn,moreauthors,10pt]{ds_report}
 \usepackage[english]{babel}
+\usepackage{verbatim}
 
 \graphicspath{{fig/}}
 
@@ -31,32 +32,31 @@
 %----------------------------------------------------------------------------------------
 
 % Header
-\JournalInfo{FRI Natural language processing course 2021}
+\JournalInfo{FRI Natural language processing course 2024}
 
 % Interim or final report
 \Archive{Project report} 
 %\Archive{Final report} 
 
 % Article title
-\PaperTitle{Natural language processing course Latex Template} 
+\PaperTitle{LLM Prompt Strategies for Commonsense-Reasoning Tasks} 
 
 % Authors (student competitors) and their info
-\Authors{John Doe, Jane Doe, and Mike Smith}
+\Authors{Matic Pristavnik Vrešnjak, Mitja Kocjančič, and Songeun Hong}
 
 % Advisors
 \affiliation{\textit{Advisors: Slavko Žitnik}}
 
 % Keywords
-\Keywords{Keyword1, Keyword2, Keyword3 ...}
+\Keywords{Large Language Models (LLMs), Prompt Strategies, Comparative Analysis}
 \newcommand{\keywordname}{Keywords}
 
 
 %----------------------------------------------------------------------------------------
 %	ABSTRACT
 %----------------------------------------------------------------------------------------
-
 \Abstract{
-The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here.
+The surge in the popularity of Large Language Models (LLMs) such as chatGPT, PaLM, and Gemini has led to their widespread adoption in both personal and commercial domains. Many of these cutting-edge models rely on the transformer architecture. With the increasing use of LLMs, there is a growing need to devise prompts that facilitate the generation of relevant and informative responses, particularly for tasks necessitating commonsense reasoning. Such tasks draw upon everyday knowledge for resolution. Consequently, various prompt strategies have emerged to enhance model performance on such tasks. In response to the expanding array of prompt strategies, this paper offers a comprehensive comparison of each approach, aiming to shed light on their effectiveness and applicability in enhancing LLM performance.
 }
 
 %----------------------------------------------------------------------------------------
@@ -77,18 +77,118 @@ The abstract goes here. The abstract goes here. The abstract goes here. The abst
 %----------------------------------------------------------------------------------------
 
 \section*{Introduction}
-	These latex files are intended to serve as a the template for the NLP course at FRI.  The template is adapted from the FRI Data Science Project Competition. template  If you find mistakes in the template or have problems using it, please consult Jure Demšar (\href{mailto:jure.demsar@fri.uni-lj.si}{jure.demsar@fri.uni-lj.si}).
-	
-	In the Introduction section you should write about the relevance of your work (what is the purpose of the project, what will we solve) and about related work (what solutions for the problem already exist). Where appropriate, reference scientific work conducted by other researchers. For example, the work done by Demšar et al. \cite{Demsar2016BalancedMixture} is very important for our project. The abbreviation et al. is for et alia, which in latin means and others, we use this abbreviation when there are more than two authors of the work we are citing. If there are two authors (or if there is a single author) we just write down their surnames. For example, the work done by Demšar and Lebar Bajec \cite{Demsar2017LinguisticEvolution} is also important for successful completion of our project.
 
+    %Matic: Mockup of the introduction. You can change any part that you don't like about this text :).
+    %Matic: I need some time to think about the finish up of the introduction.
+    %Matic: I will take a one last look at this but I think I sholud be fine after today
+    Recent years have seen a rise in the popularity of Large language models (LLMs). LLMs such as chatGPT, PaLM, Gemini, and others have already been adopted for personal and commercial use. Many of the current state-of-the-art models are based on the transformer architecture\cite{DBLP:journals/corr/VaswaniSPUJGKP17}. Because of the wide adoption of LLMs, it has become more important to provide prompts that encourage the model to generate relevant and informative responses to tasks that require commonsense reasoning. Tasks that require commonsense reasoning are those that require everyday knowledge to solve. This has led to the development of several strategies for providing prompts that allow models to perform better on such tasks. Due to the growing number of prompt strategies, we present a comprehensive comparison of each strategy.
+
+
+    %Matic: I am debating if we should split this part into two sections. One for the introduction and one for related work
+    %Sienna: I think it would be good to split two sections.
+    %Matic: Ok
+
+    \section*{Related work}
+    %Matic: If you two find any methods that look interesting describe them here.
+    %Matic: Added a small bit about Chains of thought in DSPy since the assistant mentioned this when I was talking to him. Sorry for the late add, I remembered at the last moment.
+    One strategy for providing prompts is Chain of thought (CoT)\newline\cite{wei2023chainofthought}. The core idea of CoT is that we give the model a demonstration of how to come to the solution or ask it for a step-by-step response. CoT has been proven to improve the performance of LLMs on commonsense reasoning and mathematical datasets. One limitation mentioned in the original CoT paper was that CoT only benefits large models like chatGPT and not smaller models. Frameworks like DSPy\cite{khattab2023dspy} have also integrated functionality that enables the implementation of custom Chains of thought. Strategies with similar approaches are In-context Learning\cite{luo2024incontext} and Plan-and-Solve Techniques\cite{wang2023planandsolve}.
+    
+    Another example of prompt strategies is Promptbreeder\cite{fernando2023promptbreeder}. In contrast to methods like CoT, which are based on hand-crafted prompts, Promptbreeder can generate optimized prompts. Promptbreeder relies on LLM and genetic algorithms to mutate a set of prompts, which are then given to the LLM. Strategies that use generated prompts have been shown to perform better than the prompt strategies that are based on hand-crafted prompts.
+
+    The aforementioned strategies are more complex and require additional text to be added to the instruction. Simpler strategies are more oriented towards creating prompts that are clear and precise\cite{chen2023unleashing}. This includes forming unambiguous and specific prompts, allowing the model to give better and more detailed answers. Research has also shown that models can provide better answers when given emotional prompts\cite{li2023large}.
+    
+    %Matic: Sorry about the model references. They have so many authors. If it looks too weird I can remove them. I fix this by using et al -> Good! It looks more clear.
+    Previously mentioned strategies have been tested on various LLMs. LLMs that are most commonly used for testing are chatGPT\cite{openai2024gpt4}, PaLM\cite{chowdhery2022palm}, Gemini\cite{geminiteam2023gemini} and other models. Most researchers prefer to use models with a large number of parameters because larger LLMs benefit more from prompt engineering. This has led to very little research being done on smaller models.
+    
+    %Matic I added some related work for datasets to related work 
+    %Sienna: I checked references 7, 8, 9. Thank you for adding these. 
+    Because of the growing number of prompting strategies, many datasets have been used to measure their performance. Examples of such datasets are the Winograd Schema Challenge\cite{levesque2012winograd}, Textbook Question Answering\cite{Kembhavi2017AreYS},  SocialIQA\cite{sap2019socialiqa}, and many other datasets. Many of the mentioned datasets were made to challenge LLM on commonsense sense reasoning tasks.
 
 %------------------------------------------------
+%Matic: this section colud be renamed to ideals and we can use it as a jumping off point at descrbing our goals for the project.
+%Sienna: Please check the Ideals part. If you want to change the content, you can modify it.
+%Matic: I think this part is very well done
+\section*{Objectives}
+In this project, our specific objectives are as follows:
 
-\section*{Methods}
+\begin{enumerate}
+    \item \textbf{Comparison of Various Prompt Strategies}:
+    \begin{itemize}
+        \item We aim to compare the performance of different prompt strategies through carefully designed experiments under specific conditions. The goal is to assess their effectiveness in various commonsense reasoning tasks quantitatively.
+    \end{itemize}
+    
+    \item \textbf{Analysis of Commonsense Reasoning Processes}:
+    \begin{itemize}
+        \item Through meticulous analysis, we seek to understand the impact of each prompt strategy on the reasoning processes of the language models. This involves identifying how each strategy influences the decision-making process of the models, with the aim of enhancing their inference capabilities.
+    \end{itemize}
+    
+    \item \textbf{Derivation of Optimal Prompt Strategies}:
+    \begin{itemize}
+        \item By analyzing the experimental results, we intend to derive optimal prompt strategies and propose the most effective approaches for commonsense reasoning tasks. Our objective is to maximize the performance of the models and enhance their applicability in real-world scenarios.
+    \end{itemize}
+    
+    \item \textbf{Evaluation of Generalization Potential}:
+    \begin{itemize}
+        \item We aim to evaluate the potential of generalizing the findings of this project to different contexts and tasks. This assessment will help determine the broader applicability of our research across various domains.
+    \end{itemize}
+\end{enumerate}
 
+
+%Sienna: Is it correct to write down the 'Initial idea' part here? And I think we have to talk about this part carefully because it is the main section of the first report. Since I only wrote comprehensive content, I think we need to talk specifically and make a clear plan.
+
+%Matic: We could call it the initial plan since it describes the general layout of the project.
+
+%Sienna: Matic, do we have to write more specific plan?
+
+%Matic: I don't think so but I was also thinking about this yesterday. Usually, assistants don't require the plan to be very specific just the general plan and milestones (which we kind of have). 
+\section*{Initial Idea}
+
+\begin{enumerate}
+    \item \textbf{Dataset Selection}:
+    \begin{itemize}
+        \item \textbf{Winograd Schema Challenge (WSC)}: WSC encompasses a spectrum of scenarios mimicking real-world situations, rendering it apt for assessing a model's common-sense reasoning prowess. We shall utilize WSC to scrutinize and juxtapose the common-sense reasoning proficiencies of various models.
+        \item \textbf{Textbook Question Answering (TQA)}: TQA evaluates the adeptness to grasp textbook content and respond to associated queries. Employing this dataset will enable us to gauge whether a model can assimilate and apply the requisite common-sense knowledge to address real-world predicaments.
+        \item \textbf{SocialIQA}: SocialIQA scrutinizes the acumen in social contexts, assessing common-sense communication aptitudes. This dataset will evaluate a model's capacity to discern common-sense decisions across diverse social scenarios.
+    \end{itemize}
+    
+    \item \textbf{Prompt Strategies}:
+    \begin{itemize}
+        \item \textbf{Chain of Thought (CoT)}: The CoT strategy steers the model through sequential problem-solving processes or solicits step-by-step responses to enrich the model's common-sense reasoning acuity.
+        \item \textbf{In-context Learning}: This strategy facilitates the model in assimilating novel information within a given context, empowering it to conduct superior reasoning by leveraging previously acquired knowledge.
+        \item \textbf{Plan-and-Solve Techniques}: This strategy furnishes explicit blueprints and directs the model to resolve problems methodically. This is anticipated to elucidate the model's reasoning trajectory and refine its logical reasoning skills.
+    \end{itemize}
+    
+    \item \textbf{Experiment Design and Analysis Plan}:
+    \begin{itemize}
+        \item Each experiment pertaining to both datasets and prompt strategies shall be meticulously delineated as follows:
+            \begin{enumerate}
+                \item \textbf{Dataset Selection and Preprocessing}:
+                We shall leverage sentiment inference within three datasets. Each dataset will be segregated into training, validation, and test subsets, with judicious sampling techniques applied to mitigate data imbalances.
+                
+                \item \textbf{Implementation of Prompt Strategies}:
+                Three prominent prompt strategies shall be implemented. Moreover, we shall tailor or extend these strategies for fine-tuning and devising novel approaches.
+                
+                \item \textbf{Experiment Design}:
+                Experiments for each prompt strategy will adhere to a uniform structure. Each strategy will undergo training utilizing identical model architecture and hyperparameter settings. Experiments will be conducted under reproducible conditions to ensure replicability.
+                
+                \item \textbf{Performance Measurement}:
+                We shall gauge the model's training and inference durations for each strategy. Performance metrics will encompass accuracy, precision, recall, and F1 scores across each dataset.
+                
+                \item \textbf{Experiment Execution and Analysis}:
+                Experiments for each strategy will incorporate measures to ensure stability, such as cross-validation or bootstrapping. The resultant outcomes will be juxtaposed to dissect the performance of each strategy, with particular emphasis on discerning performance disparities in prevalent sentiment inference tasks.
+                
+                \item \textbf{Result Interpretation and Reporting}:
+                Experiment findings will be expounded to discern the strengths and weaknesses of each strategy. Drawing upon this analysis, a conclusive report will be compiled, advocating the optimal prompt strategy and outlining avenues for future research.
+            \end{enumerate}
+    \end{itemize}
+\end{enumerate}
+
+
+
+\begin{comment}
 Use the Methods section to describe what you did an how you did it -- in what way did you prepare the data, what algorithms did you use, how did you test various solutions ... Provide all the required details for a reproduction of your work.
-
-Below are \LaTeX examples of some common elements that you will probably need when writing your report (e.g. figures, equations, lists, code examples ...).
+%
+%Below are \LaTeX examples of some common elements that you will probably need when writing your %report (e.g. figures, equations, lists, code examples ...).
 
 
 \subsection*{Equations}
@@ -227,7 +327,7 @@ Use the Discussion section to objectively evaluate your work, do not just put pr
 
 Here you can thank other persons (advisors, colleagues ...) that contributed to the successful completion of your project.
 
-
+\end{comment}
 %----------------------------------------------------------------------------------------
 %	REFERENCE LIST
 %----------------------------------------------------------------------------------------
