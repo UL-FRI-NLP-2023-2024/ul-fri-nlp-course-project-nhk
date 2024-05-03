@@ -20,8 +20,12 @@
 %----------------------------------------------------------------------------------------
 \documentclass[fleqn,moreauthors,10pt]{ds_report}
 \usepackage[english]{babel}
+\usepackage{listings}
+\usepackage{subcaption}
+\usepackage{adjustbox}
 \usepackage{verbatim}
-
+\usepackage{tabularx}
+\usepackage{multirow}
 \graphicspath{{fig/}}
 
 
@@ -104,10 +108,224 @@ The surge in the popularity of Large Language Models (LLMs) such as chatGPT, PaL
     %Sienna: I checked references 7, 8, 9. Thank you for adding these. 
     Because of the growing number of prompting strategies, many datasets have been used to measure their performance. Examples of such datasets are the Winograd Schema Challenge\cite{levesque2012winograd}, Textbook Question Answering\cite{Kembhavi2017AreYS},  SocialIQA\cite{sap2019socialiqa}, and many other datasets. Many of the mentioned datasets were made to challenge LLM on commonsense sense reasoning tasks.
 
+%Matic: I need to fix the positining of the figures or at least make sure that the don't cause empty space to form
+%Mitja: Empty space decreased a little bit above equasions, but figures look fine to me, unless you are bothered by Figure 7 which is on its own page
+\section*{Methodology}
+
+Various prompting strategies were tested on models obtained from the Hugging Face library. The largest models for text generation on Hugging Face have around 150 billion parameters. Unfortunately, we couldn't use these models because of the limited data storage on the HPC cluster.
+
+\textbf{Mistral}, developed by Mistral AI, despite its relatively small size (only 7B parameters),it has demonstrated comparable performance to models like LLama3 and GPT-3.5. One notable drawback of this model is its tendency to suffer from hallucinations, which can cause it to veer off-topic.
+
+\textbf{ROUGE}, a set of metrics commonly used in natural language processing, evaluates performance in text summarization and translation. The metrics offered by ROUGE include:
+\begin{itemize}
+\item Precision, measures the accuracy of positive predictions made by a model, calculated as the ratio of true positive predictions to the total number of positive predictions. A perfect score is 1, and the worst is 0.
+
+\setlength{\abovedisplayskip}{1pt}
+\begin{equation}
+	\label{eqn:Precision}
+	Precision = \frac{\text{True Positives}}{\text{True Positives} + \text{False Positives}}
+\end{equation}
+
+
+\item \textbf{Recall}, also known as sensitivity or true positive rate, evaluates a model's effectiveness in identifying all positive samples. It is computed as the ratio of true positive predictions to the total number of actual positive samples, with an ideal score being 1 and the worst being 0.
+
+\begin{equation}
+	\label{eqn:Recall}
+	Recall = \frac{\text{True Positives}}{\text{True Positives} + \text{False Negatives}}
+\end{equation}
+
+\item \textbf{The F1 score}, a metric that combines precision and recall, offers a balanced assessment of model performance. It reaches its optimal value at 1 and its lowest at 0. It integrates both precision and recall, making it suitable for scenarios where a balance between these metrics is desired as shown in the equation below:
+
+\begin{equation}
+	\label{eqn:F1}
+	F1 = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}.
+\end{equation}
+
+\end{itemize}
+
+\textbf{BLEU} is a scoring algorithm commonly used to assess the quality of machine-translated text. Text with scores close to 0 is typically considered poor, while scores closer to 1 are deemed good.
+
+The datasets employed to assess various prompt strategies were obtained from Hugging Face. The datasets used to test various prompt strategies were obtained from Hugging Face. They were selected based on the task domains they covered, such as mathematics, question answering (Q\&A) and more. Noteworthy datasets utilized thus far include:
+
+\begin{itemize}
+    \item \textbf{The Winograd Schema Challenge} is a dataset frequently used to evaluate the performance of Large Language Models (LLMs). It comprises 285 sentences, each containing two phrases and an ambiguous pronoun. The model is tasked with determining which phrase better fits the sentence context. An example of such a prompt is illustrated in \ref{text:winogrand1}.
+
+    \begin{figure}[htbp]
+    \centering
+    \begin{lstlisting}[language=TeX]
+    Classify the text into A or B based on pronoun.
+        Text: Joan made sure to thank Susan for all the help she had recieved.
+        Options:
+        A) Joan
+        B) Susan
+        Answer:
+        A
+    \end{lstlisting}
+    \caption{Example of prompt and answer for winogrand schema challenge}
+    \label{text:winogrand1}
+    \end{figure}
+
+    \item \textbf{The multiArith} dataset is often utilized to evaluate a model's capability to perform multiple arithmetic operations for each question. An example of a prompt and its corresponding answer from the dataset is depicted in Figure \ref{text:multArth}. This dataset encompasses approximately 400 questions of similar nature.
+
+    \begin{figure}[htbp]
+    \centering
+    \begin{lstlisting}[language=TeX]
+    Q: A pet store had 64 puppies. In one day they sold 28 of them and put the rest into cages with 4 in each cage. How many cages did they use? 
+    A:9
+    \end{lstlisting}
+    \caption{Example of prompt and answer for multiArith dataset}
+    \label{text:multArth}
+    \end{figure}
+\end{itemize}
+
+There are numerous popular prompting strategies. Among those we've evaluated are:
+
+\begin{itemize}
+    \item \textbf{Zero-shot} This strategy relies on the model being adequately trained and exposed to extensive amounts of data. Typically, minimal changes are made to the prompt, usually involving only formatting. One improvement to this strategy involves appending "Let's think about it" to the end of the prompt to encourage the model to solve the problem step by step. An example of a zero-shot prompt is shown in Figure \ref{text:zeroshot2}.
+
+    \begin{figure}[htbp]
+    \centering
+    \begin{lstlisting}[language=TeX]
+    Classify the text into neutral, negative or positive. 
+    Text: I think the vacation is okay.
+    Sentiment:
+    \end{lstlisting}
+    \caption{Example of zero-shot prompt strategy with improvement}
+    \label{text:zeroshot2}
+    \end{figure}
+
+    \item \textbf{Few-shot} This approach enhances the prompt by incorporating examples of previously solved problems. It's important to note that this doesn't include steps on how to solve the problem, but rather presents the question and its corresponding answer. The number of solved problems added to the prompt can vary but is typically around $4$ or $5$. An example of this strategy is depicted in Figure \ref{text:few-shot}.
+
+    \begin{figure}[htbp]
+    \centering
+    \begin{lstlisting}[language=TeX]
+    This is awesome! // Negative
+    This is bad! // Positive
+    Wow that movie was rad! // Positive
+    What a horrible show! //
+    \end{lstlisting}
+    \caption{Example of few-shot strategy}
+    \label{text:few-shot}
+    \end{figure}
+
+    \item \textbf{Chain-of-thought} This strategy is often combined with few-shot. It relies on adding steps to the examples provided to the model. A simple example of this strategy can be seen in Figure \ref{text:COT}.
+
+    \begin{figure}[htbp]
+    \centering
+    \begin{lstlisting}[language=TeX]
+    The odd numbers in this group add up to an even number: 4, 8, 9, 15, 12, 2, 1.
+    A: Adding all the odd numbers (9, 15, 1) gives 25. The answer is False.
+    
+    The odd numbers in this group add up to an even number: 15, 32, 5, 13, 82, 7, 1. 
+    A:
+    \end{lstlisting}
+    \caption{Example of chain-of-thought strategy prompt}
+    \label{text:COT}
+    \end{figure}
+
+\end{itemize}
+
+
+\section*{Results}
+\subsection*{Quantitative analysis}
+
+%Mitja: Damm table stay here instead of new page
+%Matic: The table is fixed now. ! usually forces latex to place it at the right spot.
+\begin{table}[!htbp]
+\centering
+
+\begin{adjustbox}{width=\columnwidth}
+\begin{tabular}{@{}lcccccccccccc@{}}
+\toprule
+\textbf{Dataset} & \multicolumn{3}{c}{\textbf{Zero-shot}} & \multicolumn{3}{c}{\textbf{Improved zero-shot}} & \multicolumn{3}{c}{\textbf{Few-shot}} & \multicolumn{3}{c}{\textbf{Chain-of-thought}} \\
+ & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\ \midrule
+Winogrand & 0.34 & 0.64 & 0.41 & 0.26 & 0.67 & 0.36 & 0.20 & 0.80 & 0.32 & 0.24 & 0.78 & 0.37 \\
+multiArith & 0.16 &  0.65 & 0.24 & 0.23 & 0.65 & 0.34 & 0.086 & 0.38 & 0.13 & 0.17 & 0.62 & 0.26 \\ \bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Performance Metrics for Different Strategies}
+\label{tab:performance_metrics}
+\end{table}
+
+In Table \ref{tab:performance_metrics}, it's evident that the improved zero-shot prompt performs best on the following datasets. This is indicates that the model generates more accurate text when this prompting strategy is used. Compared to other strategies, the prompt's length remains relatively small, which is advantageous for smaller models since they have fewer attention heads. Applying the chain-of-thought strategy typically yields more relevant text, as indicated by the higher recall score. However, few-shot with four added examples performed the worst. This is because when this strategy was applied, the model would often return irrelevant information or, in some cases, attempt to explain already solved problems. This cloud be the result of improper model parameter settings on our part or because small models aren't able to fully utilize all examples because of there small size.
+
+\subsection*{Qualitative analysis}
+
+Zero-shot has proven to be quite unreliable, especially when using small models where the architecture isn't robust enough to compensate for unoptimized prompts. Another issue with this strategy is its heavy reliance on the model having seen a large amount of data, which can lead to the model going off-topic or providing incorrect answers. Examples of poor outputs produced by this model can be observed in Figures \ref{text:zeroshotBad}. These responses are not only incorrect but also somewhat unfocused. When applied to mathematical problems, this strategy often results in even more incoherent responses that are completely unrelated to the question.
+
+\begin{figure}[htbp]
+\centering
+\begin{lstlisting}[language=TeX]
+Classify the text into A or B based on pronoun.
+    Text: The city councilmen refused the demonstrators a permit because they advocated violence.
+    Options:
+    A) The city councilmen
+    B) The demonstrators
+    Answer:
+    1. Identify the subject and object of the sentence.
+        Subject: The city councilmen
+        Object: a permit
+    2. Determine which pronoun is used to refer to each noun.
+        A) The city councilmen -> They
+        B) The demonstrators -> They
+    3. Check if the pronouns match.
+        They (city councilmen) = They (demonstrators)
+    4. Classify the text as A or B based on the matching pronoun.
+        Since both 'They' refer to different groups, this question should be classified as B. However, since the correct answer is A, there seems to be an error in the options provided.
+
+    Corrected answer: A
+\end{lstlisting}
+\caption{Example of a bad zero-shot response}
+\label{text:zeroshotBad}
+\end{figure}
+
+When zero-shot is enhanced with a simple chain-of-thought strategy, it produces much better and more on-topic responses. In our case, we improved it by simply adding "Solve the problem step by step, please". The model's response can be seen in Figure \ref{text:zeroshotGood}. This demonstrates that asking the model to show its reasoning steps leads to improved performance. However, it's important to note that even with this improvement, the model can still produce strange and nonsensical outputs. One such example is when the model concludes that both options are correct or that no option is correct. This strategy shows the largest improvement on mathematical problems because we typically solve mathematical problems by thinking in steps.
+
+\begin{figure}[htbp]
+\centering
+\begin{lstlisting}[language=TeX]
+Classify the text into A or B based on pronoun. Solve the problem step by step please
+    Text: The city councilmen refused the demonstrators a permit because they advocated violence.
+    Options:
+    A) The city councilmen
+    B) The demonstrators
+    Answer:
+Generated output
+1. Identify the subject and object of the sentence.
+        Subject: The city councilmen
+        Object: They (demonstrators)
+    2. Determine which group used the pronoun "they" in the sentence.
+        Pronoun "they" refers to the demonstrators.
+    3. Based on the pronoun, classify the text.
+        Since the pronoun "they" refers to the demonstrators, the text should be classified as B.
+\end{lstlisting}
+\caption{Example of a good zero-shot response when a simple chain-of-taught}
+\label{text:zeroshotGood}
+\end{figure}
+
+When few-shot was employed to enhance prompts, the model demonstrated significantly better performance in staying on topic compared to the previous two strategies. This improvement was particularly notable in questions related to mathematical problems. However, one weakness of few-shot is that beyond a certain number of examples, the strategy may not provide additional benefits and could potentially lead to worse performance. Additionally, this strategy requires the examples to be somewhat similar to the question, as disparate examples might mislead the model. The example answer also have to be other wise the model gives the same answer for every question.
+
+On the other hand, when the chain of thought was utilized as a prompting strategy, the model's results were notably more accurate. The generated text was more concise and focused, with less meandering from the model. Similar to few-shot, this method also requires the chains of thought to be somewhat relevant to the problem the model is attempting to solve.
+
+\section*{Conclusions and future plans}
+
+In this report, we presented the impact of each prompting strategy and briefly outline their respective benefits. We conducted both quantitative and qualitative analyses for each strategy. Our future goals include:
+
+\begin{enumerate}
+    \item Gather more datasets for testing prompt strategies: Expanding the variety of datasets will allow us to evaluate the effectiveness of prompting strategies across different domains.
+    
+    \item Improve quantitative analysis: Our current analyses are somewhat unreliable, so we aim to enhance them by incorporating additional metrics such as accuracy, relevancy, and others.
+    
+    \item Addressing issues with small models: We observed that small models are prone to producing strange outputs when the input prompts are lengthy. Therefore, we plan to repeat the experiments using larger models to mitigate this issue.
+    
+    \item Implementing more complex prompting strategies: We intend to explore and implement more advanced prompting strategies such as self-consistency and automatic chain-of-thought, which could potentially further improve model performance.
+\end{enumerate}
+
 %------------------------------------------------
 %Matic: this section colud be renamed to ideals and we can use it as a jumping off point at descrbing our goals for the project.
 %Sienna: Please check the Ideals part. If you want to change the content, you can modify it.
 %Matic: I think this part is very well done
+\begin{comment}
 \section*{Objectives}
 In this project, our specific objectives are as follows:
 
@@ -141,6 +359,7 @@ In this project, our specific objectives are as follows:
 %Sienna: Matic, do we have to write more specific plan?
 
 %Matic: I don't think so but I was also thinking about this yesterday. Usually, assistants don't require the plan to be very specific just the general plan and milestones (which we kind of have). 
+
 \section*{Initial Idea}
 
 \begin{enumerate}
@@ -182,7 +401,7 @@ In this project, our specific objectives are as follows:
             \end{enumerate}
     \end{itemize}
 \end{enumerate}
-
+\end{comment}
 
 
 \begin{comment}
