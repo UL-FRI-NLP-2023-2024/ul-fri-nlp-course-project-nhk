@@ -44,14 +44,14 @@ def generate_gt_winogrand(dataset):
         sample = dataset["test"]["text"][i]
         options = dataset["test"]["options"][i]
         label = int(dataset["test"]["label"][i])
-        # prompt = f"""Classify the text into A or B based on pronoun.
-        # Text: {sample}
-        # Options:
-        # A) {options[0]}
-        # B) {options[1]}
-        # Answer:
-        # {options[label]}
-        # """
+        prompt = f"""Classify the text into A or B based on pronoun.
+        Text: {sample}
+        Options:
+        A) {options[0]}
+        B) {options[1]}
+        Answer:
+        {options[label]}
+        """
         prompt = f"""
         # {options[label]}
         # """
