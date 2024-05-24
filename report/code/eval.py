@@ -18,7 +18,7 @@ def load_predictions(path):
     sum_time = 0.0
     output = ""
     question_num=0
-    with open(path, "r",encoding="utf8") as file:
+    with open(path, "r",encoding="ISO-8859-1") as file:
         new_output = 0
         for line in file:
             if "Generated output"==line.strip() or new_output==1:
@@ -52,12 +52,25 @@ def generate_gt_winogrand(dataset):
         Answer:
         {options[label]}
         """
-        prompt = f"""
+        #prompt = f"""
         # {options[label]}
         # """
+
+
         gt.append(prompt)
 
     return gt
+
+def generate_gt_squad(dataset):
+    gt = []
+    for i in range(100-1):
+        text = dataset["train"]["question"][i]
+        prompt = f"""{dataset["train"]["answers"][i]["text"]}"""
+
+        gt.append(prompt)
+
+    return gt
+
 
 
 def generate_gt_multiArth(dataset):
@@ -113,6 +126,7 @@ txt_files = filter(lambda x: x[-4:] == '.txt', list)
 login(token="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")
 dataset_win = load_dataset("winograd_wsc", "wsc285")
 dataset_arth = load_dataset("ChilleD/MultiArith")
+dataset_squad = load_dataset("rajpurkar/squad")
 print("\n")
 print("Starting eval\n")
 dataset_to_eval = ["multArith"]
@@ -131,6 +145,8 @@ for file_path in list:
         gt = generate_gt_multiArth(dataset_arth)
     elif dataset_name == "winogrand":
         gt = generate_gt_winogrand(dataset_win)
+    elif dataset_name == "squad":
+        gt = generate_gt_squad(dataset_squad)
 
     eval_rouge(pred,gt)
 
