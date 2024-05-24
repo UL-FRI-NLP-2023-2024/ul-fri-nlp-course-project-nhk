@@ -7,6 +7,7 @@ import numpy as np
 from rouge_score import rouge_scorer
 import nltk
 from nltk.metrics import scores
+from bert_score import BERTScorer
 from nltk.tokenize import word_tokenize
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction, corpus_bleu
 
@@ -51,12 +52,7 @@ def generate_gt_winogrand(dataset):
         # Answer:
         # {options[label]}
         # """
-        prompt = f"""Classify the text into A or B based on pronoun.
-        # Text: {sample}
-        # Options:
-        # A) {options[0]}
-        # B) {options[1]}
-        # Answer:
+        prompt = f"""
         # {options[label]}
         # """
         gt.append(prompt)
@@ -73,10 +69,9 @@ def generate_gt_multiArth(dataset):
 
     return gt
 
-
 def eval_bertscore(pred,gt):
     P, R, F1 = score(pred, gt, lang='en')
-    print("Beart")
+    print("Bert score eval:")
     print("Precision: "+str(P.mean()))
     print("Recall: "+str((R.mean())))
     print("F1: "+str((F1.mean())))
@@ -94,15 +89,15 @@ def bleu(gen, ref):
     print("BLEU score: "+str(score_bleu))
 
 def eval_rouge(pred,gt):
-    scorer = rouge_scorer.RougeScorer(['rouge1', 'rougeL'], use_stemmer=True)
+    scorer = rouge_scorer.RougeScorer(['rouge2', 'rougeL'], use_stemmer=True)
     scores_R = []
     scores_P = []
     scores_F = []
     for pred,gt in zip(pred,gt):
         scores = scorer.score(gt,pred)
-        scores_R.append(scores["rouge1"].recall)
-        scores_P.append(scores["rouge1"].precision)
-        scores_F.append(scores["rouge1"].fmeasure)
+        scores_R.append(scores["rouge2"].recall)
+        scores_P.append(scores["rouge2"].precision)
+        scores_F.append(scores["rouge2"].fmeasure)
 
     print("Rouge")
     mean_R = sum(scores_R)/ (len(scores_R))
@@ -140,6 +135,8 @@ for file_path in list:
     eval_rouge(pred,gt)
 
     bleu(pred,gt)
+
+    eval_bertscore(pred,gt)
 
     print("Average time to generate prompt: "+str(time))
 
