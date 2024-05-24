@@ -114,7 +114,13 @@ The surge in the popularity of Large Language Models (LLMs) such as chatGPT, PaL
 
 Various prompting strategies were tested on models obtained from the Hugging Face library. The largest models for text generation on Hugging Face have around 150 billion parameters. Unfortunately, we couldn't use these models because of the limited data storage on the HPC cluster.
 
+\textbf{Command}, model was developed by Cohere AI. This model is roughly the size of GPT3.5 (175B parameters) and was used as an alternative to GPT-3.5 because they offered a free tire with the only limitation being the number of prompts per month.
+
 \textbf{Mistral}, developed by Mistral AI, despite its relatively small size (only 7B parameters),it has demonstrated comparable performance to models like LLama3 and GPT-3.5. One notable drawback of this model is its tendency to suffer from hallucinations, which can cause it to veer off-topic.
+
+\textbf{LLAMA3}, developed by Meta, is a one of the stat of the art models that is able to achieve good results even when the model has less parameters. The model that we used for our work is 8B parameters large. LLAMA3 is less prone to hallucinations when compered to models such as Mistral.
+
+\textbf{T5}, developed by Google Research, stands for "Text-To-Text Transfer Transformer" and is designed to handle a wide variety of natural language processing tasks by casting them as text-to-text problems. The T5 model we used has 11B parameters. It excels in tasks requiring comprehensive understanding and generation of text, making it a valuable asset for commonsense reasoning tasks. 
 
 \textbf{ROUGE}, a set of metrics commonly used in natural language processing, evaluates performance in text summarization and translation. The metrics offered by ROUGE include:
 \begin{itemize}
@@ -144,6 +150,8 @@ Various prompting strategies were tested on models obtained from the Hugging Fac
 \end{itemize}
 
 \textbf{BLEU} is a scoring algorithm commonly used to assess the quality of machine-translated text. Text with scores close to 0 is typically considered poor, while scores closer to 1 are deemed good.
+
+\textbf{Bert score:} Due to the unreliable nature of evaluating model results, we utilized BERT to predict the score of the text. As Rouge and BLEU provided inaccurate or poor results, the resulting BERT score was then used to calculate precision, recall, and F1 score.
 
 The datasets employed to assess various prompt strategies were obtained from Hugging Face. The datasets used to test various prompt strategies were obtained from Hugging Face. They were selected based on the task domains they covered, such as mathematics, question answering (Q\&A) and more. Noteworthy datasets utilized thus far include:
 
@@ -176,6 +184,22 @@ The datasets employed to assess various prompt strategies were obtained from Hug
     \caption{Example of prompt and answer for multiArith dataset}
     \label{text:multArth}
     \end{figure}
+
+    \item \textbf{The SQuAD dataset} is commonly used for benchmarking different LLMs. The dataset consists of thousands of questions on various topics. Many of the questions include text that provides context or background information, which the model can utilize. An example of a dataset question and prompt with an answer can be seen in Figure \ref{text:squad}.
+
+    \begin{figure}[htbp]
+    \centering
+    \begin{lstlisting}[language=TeX]
+    Passage:Architecturally, the school has a Catholic character. Atop the Main Building's gold dome is a golden statue of the Virgin Mary. Immediately in front of the Main Building and facing it, is a copper statue of Christ with arms upraised with the legend "Venite Ad Me Omnes".
+
+    Question: To whom did the Virgin Mary allegedly appear in 1858 in Lourdes France?
+    Answer:
+    The Virgin Mary allegedly appeared to Saint Bernadette Soubirous in 1858 in Lourdes, France.
+    \end{lstlisting}
+    \caption{Example of prompt and answer for multiArith dataset}
+    \label{text:squad}
+    \end{figure}
+    
 \end{itemize}
 
 There are numerous popular prompting strategies. Among those we've evaluated are:
@@ -239,19 +263,88 @@ There are numerous popular prompting strategies. Among those we've evaluated are
 \toprule
 \textbf{Dataset} & \multicolumn{3}{c}{\textbf{Zero-shot}} & \multicolumn{3}{c}{\textbf{Improved zero-shot}} & \multicolumn{3}{c}{\textbf{Few-shot}} & \multicolumn{3}{c}{\textbf{Chain-of-thought}} \\
  & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\ \midrule
-Winogrand & 0.34 & 0.64 & 0.41 & 0.26 & 0.67 & 0.36 & 0.20 & 0.80 & 0.32 & 0.24 & 0.78 & 0.37 \\
-multiArith & 0.16 &  0.65 & 0.24 & 0.23 & 0.65 & 0.34 & 0.086 & 0.38 & 0.13 & 0.17 & 0.62 & 0.26 \\ \bottomrule
+Winogrand & 0.85 & 0.84 & 0.84 & 0.85 & 0.89 & 0.87 & 0.87 & 0.89 & 0.88 & 0.87 & 0.91 & 0.89 \\
+multiArith & 0.81 &  0.87 & 0.84 & 0.82 & 0.88 & 0.85 & 0.79 & 0.84 & 0.82 & 0.80 & 0.87 & 0.83 \\
+Squad & 0.78 &  0.84 & 0.81 & 0.72 & 0.82 & 0.77 & 0.72 & 0.87 & 0.79 & 0.78 & 0.85 & 0.81 \\\bottomrule
 \end{tabular}
 \end{adjustbox}
-\caption{Performance Metrics for Different Strategies}
+\caption{Performance Metrics for Different Strategies for the mistral model}
 \label{tab:performance_metrics}
 \end{table}
 
-In Table \ref{tab:performance_metrics}, it's evident that the improved zero-shot prompt performs best on the following datasets. This is indicates that the model generates more accurate text when this prompting strategy is used. Compared to other strategies, the prompt's length remains relatively small, which is advantageous for smaller models since they have fewer attention heads. Applying the chain-of-thought strategy typically yields more relevant text, as indicated by the higher recall score. However, few-shot with four added examples performed the worst. This is because when this strategy was applied, the model would often return irrelevant information or, in some cases, attempt to explain already solved problems. This cloud be the result of improper model parameter settings on our part or because small models aren't able to fully utilize all examples because of there small size.
+In Table \ref{tab:performance_metrics}, we can observe that the Mistral model benefits from the application of prompting strategies. Notably, on the Winogrand dataset, the best-performing strategy was CoT. However, CoT did not perform as well on the MultiArth dataset, where a simpler version of CoT performed slightly better. Additionally, the worst-performing prompting strategy on the MultiArth dataset was few-shot.
+
+
+\begin{table}[!htbp]
+\centering
+\begin{adjustbox}{width=\columnwidth}
+\begin{tabular}{@{}lcccccccccccc@{}}
+\toprule
+\textbf{Dataset} & \multicolumn{3}{c}{\textbf{Zero-shot}} & \multicolumn{3}{c}{\textbf{Improved zero-shot}} & \multicolumn{3}{c}{\textbf{Few-shot}} & \multicolumn{3}{c}{\textbf{Chain-of-thought}} \\
+ & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\ \midrule
+Winogrand & 0.85 & 0.72 & 0.78 & 0.84 & 0.77 & 0.80 & 0.83 & 0.69 & 0.75 & 0.8532 & 0.78 & 0.81 \\
+multiArith & 0.88 &  0.87 & 0.87 & 0.87 & 0.88 & 0.87 & 0.88 & 0.81 & 0.84 & 0.84 & 0.88 & 0.86 \\ 
+Squad & 0.84 &  0.85 & 0.84 & 0.84 & 0.85 & 0.84 & 0.85 & 0.85 & 0.85 & 0.80 & 0.82 & 0.81 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Performance Metrics for Different Strategies for the Command model}
+\label{tab:performance_metrics_coomando}
+\end{table}
+
+When the much larger Command model was applied, the results were unsurprisingly much better. In \ref{tab:performance_metrics_commando}, we can see that the model benefited most when CoT was applied to different tasks. We can also notice that when few-shot prompting was applied, the model produced far fewer relevant prompts compared to other strategies. This is because few-shot prompting can often lead to shorter results, which can be less relevant if the model has difficulty answering the question. Additionally, we observe that when an open-ended question answering dataset (SQuAD) is used, prompting strategies lose their effectiveness.
+
+
+\begin{table}[!htbp]
+\centering
+\begin{adjustbox}{width=\columnwidth}
+\begin{tabular}{@{}lcccccccccccc@{}}
+\toprule
+\textbf{Dataset} & \multicolumn{3}{c}{\textbf{Zero-shot}} & \multicolumn{3}{c}{\textbf{Improved zero-shot}} & \multicolumn{3}{c}{\textbf{Few-shot}} & \multicolumn{3}{c}{\textbf{Chain-of-thought}} \\
+ & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\ \midrule
+Winogrand & 0.85 & 0.72 & 0.78 & 0.84 & 0.77 & 0.80 & 0.83 & 0.69 & 0.75 & 0.85 & 0.78 & 0.81 \\
+multiArith & 0.88 &  0.87 & 0.87 & 0.87 & 0.88 & 0.87 & 0.88 & 0.81 & 0.84 & 0.84 & 0.88 & 0.86 \\
+Squad & 0.74 &  0.82 & 0.78 & 0.72 & 0.82 & 0.77 & 0.73 & 0.82 & 0.77 & 0.78 & 0.80 & 0.79 \\  \bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Performance Metrics for Different Strategies for the LLama3 model}
+\label{tab:performance_metrics_llama}
+\end{table}
+
+In Table \ref{tab:performance_metrics_llama}, we can see the results of applying prompting strategies to different datasets. We observe that the LLama3 model performed worse when few-shot prompting was applied to the Winogrand schema. This is because, in many cases, the model did not return any answer and left the questions unanswered. However, this issue did not occur with the MultiArth dataset. Additionally, we notice that when CoT or step-by-step prompting was applied, the model performed slightly better than with few-shot prompting. Similarly to the Command model, when prompting strategies were applied to the SQuAD dataset, the results showed little to no improvement and, in some cases, were worse than zero-shot prompting.
+
+
+%Sienna: I am also running the squad dataset by referring to the code you committed to github. I will add the results as soon as they are finalized.
+
+%Matic: can you do the report commit this time so that you have at lest one commit so that there won't be any problems if the assistants actually check the commits. Sorry if the request is a bit strange. Other wise thanks for the help on the report :)
+
+
+%Sienna: No problem! Thank you for telling me! I'll do it now. Do I have to upload whole report or just pdf at the /Reports_compiled_submission?
+
+%Matic: The pdf it self is enough but usually i alos add the source just in case. yes the pdf gose there.
+
+\begin{table}[!htbp]
+\centering
+
+\begin{adjustbox}{width=\columnwidth}
+\begin{tabular}{@{}lcccccccccccc@{}}
+\toprule
+\textbf{Dataset} & \multicolumn{3}{c}{\textbf{Zero-shot}} & \multicolumn{3}{c}{\textbf{Improved zero-shot}} & \multicolumn{3}{c}{\textbf{Few-shot}} & \multicolumn{3}{c}{\textbf{Chain-of-thought}} \\
+ & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\ \midrule
+ Winogrand & 0.82 & 0.80 & 0.81 & 0.84 & 0.83 & 0.83 & 0.85 & 0.84 & 0.84 & 0.86 & 0.85 & 0.85 \\
+ multiArith & 0.78 &  0.82 & 0.80 & 0.79 & 0.83 & 0.81 & 0.77 & 0.81 & 0.79 & 0.78 & 0.82 & 0.80 \\ 
+ Squad & 0.80 &  0.81 & 0.80 & 0.81 & 0.82 & 0.81 & 0.79 & 0.80 & 0.79 & 0.82 & 0.83 & 0.82 \\ \bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Performance Metrics for Different Strategies for the T5}
+\label{tab:performance_metrics_T5}
+\end{table}
+
+In Table \ref{tab:performance_metrics_T5}, we can observed that transitioning from Zero-shot to Improved zero-shot consistently resulted in improvements in precision, recall, and F1 scores across all datasets. This indicates that the Improved zero-shot strategy contributed to enhancing the model's understanding and predictive capabilities. The Few-shot strategy showed performance improvements over Zero-shot in Winogrand and Squad datasets, but a slight decrease in performance in multiArith, suggesting that the effectiveness of the few-shot strategy may vary depending on the characteristics of the dataset. The chain-of-thought strategy demonstrated the highest performance across all datasets, particularly excelling in problem-solving, which requires complex reasoning processes. Through this analysis, we can understand how different strategies affect the model's performance under specific conditions and dataset characteristics.
 
 \subsection*{Qualitative analysis}
 
-Zero-shot has proven to be quite unreliable, especially when using small models where the architecture isn't robust enough to compensate for unoptimized prompts. Another issue with this strategy is its heavy reliance on the model having seen a large amount of data, which can lead to the model going off-topic or providing incorrect answers. Examples of poor outputs produced by this model can be observed in Figures \ref{text:zeroshotBad}. These responses are not only incorrect but also somewhat unfocused. When applied to mathematical problems, this strategy often results in even more incoherent responses that are completely unrelated to the question.
+Zero-shot has proven to be quite unreliable, especially when using small models where the architecture isn't robust enough to compensate for unoptimized prompts. Another issue with this strategy is its heavy reliance on the model having seen a large amount of data, which can lead to the model going off-topic or providing incorrect answers. Examples of poor outputs produced by this model can be observed in Figures \ref{text:zeroshotBad}. These responses are not only incorrect but also somewhat unfocused. When applied to mathematical problems, this strategy often results in even more incoherent responses that are completely unrelated to the question. When a larger model used the performance showed a slightly improvement. This is mostly because larger models are able to attend to more words different words and are usually trained on larger amount of data. Which enable the model to have better understanding and knowledge about a large variety of topic as well as a large number of examples to rely on.
 
 \begin{figure}[htbp]
 \centering
@@ -279,9 +372,9 @@ Classify the text into A or B based on pronoun.
 \label{text:zeroshotBad}
 \end{figure}
 
-When zero-shot is enhanced with a simple chain-of-thought strategy, it produces much better and more on-topic responses. In our case, we improved it by simply adding "Solve the problem step by step, please". The model's response can be seen in Figure \ref{text:zeroshotGood}. This demonstrates that asking the model to show its reasoning steps leads to improved performance. However, it's important to note that even with this improvement, the model can still produce strange and nonsensical outputs. One such example is when the model concludes that both options are correct or that no option is correct. This strategy shows the largest improvement on mathematical problems because we typically solve mathematical problems by thinking in steps.
+When zero-shot is enhanced with a simple chain-of-thought strategy, it produces much better and more on-topic responses. In our case, we improved it by simply adding "Solve the problem step by step, please". The model's response can be seen in Figure \ref{text:zeroshotGood}. This demonstrates that asking the model to show its reasoning steps leads to improved performance. However, it's important to note that even with this improvement, the model can still produce strange and nonsensical outputs.This problem only arise with smaller models where as larger model are considerably more resistant to such problems. One such example is when the model concludes that both options are correct or that no option is correct. This strategy shows the largest improvement on mathematical problems because we typically solve mathematical problems by thinking in steps.
 
-\begin{figure}[htbp]
+\begin{figure}[!htbp]
 \centering
 \begin{lstlisting}[language=TeX]
 Classify the text into A or B based on pronoun. Solve the problem step by step please
@@ -307,8 +400,19 @@ When few-shot was employed to enhance prompts, the model demonstrated significan
 
 On the other hand, when the chain of thought was utilized as a prompting strategy, the model's results were notably more accurate. The generated text was more concise and focused, with less meandering from the model. Similar to few-shot, this method also requires the chains of thought to be somewhat relevant to the problem the model is attempting to solve.
 
-\section*{Conclusions and future plans}
+\section*{Conclusions}
+%Sienna: I changed the content of the Conclusions and Future works to Conclusions. I wrote it down comprehensively, but if you want to change the content, feel free to do so.
+%Sienna: I don't know why Figure 8 is below the Conclusions part.
+%Matic: fixed figure 8
+In this study, we examined various prompting strategies for tasks requiring commonsense reasoning. We evaluated the performance of these strategies across various models and datasets such as Command, Mistral, LLAMA3, and T5.
 
+Our research findings demonstrate that prompting strategies significantly influence the performance of Large Language Models (LLMs), particularly evident in tasks like the Winograd Schema Challenge and mathematical problem-solving. The Chain-of-Thought (CoT) approach emerged as particularly effective, consistently enhancing model performance across diverse datasets and models. The step-by-step approach of these strategies proved useful in guiding the model's reasoning process and generating more accurate responses.
+
+Prompting strategies using a small number of examples also showed promise, but their effectiveness varied depending on the dataset and model size. Generally, larger models benefited more from few-shot prompting strategies, while smaller models yielded mixed results. On the other hand, zero-shot strategies, although intuitive, were less reliable, particularly in smaller models, often producing scattered or incorrect responses.
+
+Overall, our research underscores the importance of tailored prompting strategies in improving the performance of LLMs for commonsense reasoning tasks. Future research could explore more sophisticated prompting techniques and investigate their impact across a wider range of tasks and models. Additionally, fine-tuning prompting strategies for specific domains or applications could optimize LLM performance and facilitate the integration of commonsense reasoning into real-world applications.
+
+\begin{comment}
 In this report, we presented the impact of each prompting strategy and briefly outline their respective benefits. We conducted both quantitative and qualitative analyses for each strategy. Our future goals include:
 
 \begin{enumerate}
@@ -320,6 +424,7 @@ In this report, we presented the impact of each prompting strategy and briefly o
     
     \item Implementing more complex prompting strategies: We intend to explore and implement more advanced prompting strategies such as self-consistency and automatic chain-of-thought, which could potentially further improve model performance.
 \end{enumerate}
+\end{comment}
 
 %------------------------------------------------
 %Matic: this section colud be renamed to ideals and we can use it as a jumping off point at descrbing our goals for the project.
