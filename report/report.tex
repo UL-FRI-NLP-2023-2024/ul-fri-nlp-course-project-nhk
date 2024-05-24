@@ -196,7 +196,7 @@ The datasets employed to assess various prompt strategies were obtained from Hug
     Answer:
     The Virgin Mary allegedly appeared to Saint Bernadette Soubirous in 1858 in Lourdes, France.
     \end{lstlisting}
-    \caption{Example of prompt and answer for multiArith dataset}
+    \caption{Example of prompt and answer for SQuAD dataset}
     \label{text:squad}
     \end{figure}
     
@@ -292,7 +292,7 @@ Squad & 0.84 &  0.85 & 0.84 & 0.84 & 0.85 & 0.84 & 0.85 & 0.85 & 0.85 & 0.80 & 0
 \label{tab:performance_metrics_coomando}
 \end{table}
 
-When the much larger Command model was applied, the results were unsurprisingly much better. In \ref{tab:performance_metrics_commando}, we can see that the model benefited most when CoT was applied to different tasks. We can also notice that when few-shot prompting was applied, the model produced far fewer relevant prompts compared to other strategies. This is because few-shot prompting can often lead to shorter results, which can be less relevant if the model has difficulty answering the question. Additionally, we observe that when an open-ended question answering dataset (SQuAD) is used, prompting strategies lose their effectiveness.
+When the much larger Command model was applied, the results were unsurprisingly much better. In \ref{tab:performance_metrics_coomando}, we can see that the model benefited most when CoT was applied to different tasks. We can also notice that when few-shot prompting was applied, the model produced far fewer relevant prompts compared to other strategies. This is because few-shot prompting can often lead to shorter results, which can be less relevant if the model has difficulty answering the question. Additionally, we observe that when an open-ended question answering dataset (SQuAD) is used, prompting strategies lose their effectiveness.
 
 
 \begin{table}[!htbp]
@@ -321,7 +321,17 @@ In Table \ref{tab:performance_metrics_llama}, we can see the results of applying
 
 %Sienna: No problem! Thank you for telling me! I'll do it now. Do I have to upload whole report or just pdf at the /Reports_compiled_submission?
 
-%Matic: The pdf it self is enough but usually i alos add the source just in case. yes the pdf gose there.
+%Matic: The pdf it self is enough but usually i alos add the source just in case. yes the pdf gose there. yes the pdf is in Reports_compiled_submission.
+
+%Sienna: I uploaded the report. Please check it again.
+
+%Matic: found small problem i fixed it now so can you do a reupload one reference was wrong sorry other wise the commit was fine.
+
+%Sieena: Okay, no problem. I'll reupload it. I have to re-download the report, right?
+
+%Matic:yes you have to re-download
+
+%Sienna: Okay
 
 \begin{table}[!htbp]
 \centering
